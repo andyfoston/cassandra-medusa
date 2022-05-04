@@ -25,7 +25,7 @@ import subprocess
 import time
 import uuid
 from pathlib import Path
-from ssl import SSLContext, PROTOCOL_TLS, PROTOCOL_TLSv1_2, CERT_REQUIRED
+from ssl import SSLContext, PROTOCOL_TLS, CERT_REQUIRED
 from subprocess import PIPE
 from zipfile import ZipFile
 
@@ -820,7 +820,7 @@ def _i_can_download_the_backup_single_table_successfully(context, backup_name, f
 @then(r'Test TLS version connections if "{client_encryption}" is turned on')
 def _i_can_connect_using_all_tls_versions(context, client_encryption):
     if client_encryption == 'with_client_encryption':
-        for tls_version in [PROTOCOL_TLS]:  # , PROTOCOL_TLSv1_2]:
+        for tls_version in [PROTOCOL_TLS]:
             connect_cassandra(True, tls_version)
 
 
