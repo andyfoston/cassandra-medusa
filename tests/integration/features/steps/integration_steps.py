@@ -1293,6 +1293,8 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
             connected = True
         except cassandra.cluster.NoHostAvailable:
             attempt += 1
+            if attempt >= 10:
+                raise
             time.sleep(10)
 
     if tls_version is not PROTOCOL_TLS:  # other TLS versions used for testing, close the session
