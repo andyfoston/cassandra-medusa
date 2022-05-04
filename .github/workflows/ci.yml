@@ -211,7 +211,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.BUCKET_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.BUCKET_SECRET }}
       run: |
-        set -e
+        set +e
         . venv/bin/activate
         if [[ "${{ matrix.it-backend }}" == "ibm" ]];
         then
@@ -267,6 +267,9 @@ jobs:
         # Local storage tests
           ./run_integration_tests.sh -v --cassandra-version=${{ matrix.cassandra-version }}
         fi
+        ccm showlastlog|tail -100
+        apt install -y net-tools
+        netstat -plunt
 
         # Move and convert the coverage analysis file to XML
         mv tests/integration/.coverage .
