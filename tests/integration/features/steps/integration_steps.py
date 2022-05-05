@@ -1276,7 +1276,6 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
     session = None
     _ssl_context = None
 
-
     if is_client_encryption_enable:
         ssl_context = SSLContext(tls_version)
         ssl_context.load_verify_locations(certfile)
