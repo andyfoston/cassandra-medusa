@@ -1280,7 +1280,7 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
         ssl_context = SSLContext(tls_version)
         ssl_context.load_verify_locations(certfile)
         ssl_context.verify_mode = CERT_REQUIRED
-        ssl_context.minimum_version = TLSVersion.TLSv1_1
+        ssl_context.minimum_version = TLSVersion.TLSv1_2
         ssl_context.load_cert_chain(
             certfile=usercert,
             keyfile=userkey)
