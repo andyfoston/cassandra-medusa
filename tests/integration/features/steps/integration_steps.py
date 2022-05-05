@@ -86,7 +86,7 @@ BUCKET_ROOT = "/tmp/medusa_it_bucket"
 CASSANDRA_YAML = "cassandra.yaml"
 AWS_CREDENTIALS = "~/.aws/credentials"
 GCS_CREDENTIALS = "~/medusa_credentials.json"
-PERMITTED_SSL_CIPHERS = os.environ.get("PERMITTED_SSL_CIPHERS")
+PERMITTED_SSL_CIPHERS = os.environ.get("PERMITTED_SSL_CIPHERS", "TLS_RSA_WITH_AES_256_CBC_SHA")
 
 
 def kill_cassandra():
@@ -119,7 +119,7 @@ def get_client_encryption_opts(keystore_path, trustore_path):
     return f"""ccm node1 updateconf -y 'client_encryption_options: {{ enabled: true,
         optional: false,keystore: {keystore_path}, keystore_password: testdata1,
         require_client_auth: true,truststore: {trustore_path},  truststore_password: truststorePass1,
-        protocol: TLS,algorithm: SunX509,store_type: JKS,cipher_suites: [TLS_RSA_WITH_AES_256_CBC_SHA]}}'"""
+        protocol: TLS,algorithm: SunX509,store_type: JKS,cipher_suites: [{PERMITTED_SSL_CIPHERS}]}}'"""
 
 
 def tune_ccm_settings(cluster_name):
@@ -1284,8 +1284,6 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
             certfile=usercert,
             keyfile=userkey)
         print("Permitted ciphers: %s" % PERMITTED_SSL_CIPHERS)
-        if PERMITTED_SSL_CIPHERS:
-            ssl_context.set_ciphers(PERMITTED_SSL_CIPHERS)
         _ssl_context = ssl_context
 
     import pprint
