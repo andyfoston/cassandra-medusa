@@ -267,7 +267,8 @@ jobs:
         # Local storage tests
           ./run_integration_tests.sh -v --cassandra-version=${{ matrix.cassandra-version }}
         fi
-        ccm showlastlog|tail -100
+        echo "Logs...."
+        cat ~/.ccm/scenario1/node1/logs/system.log
         apt install -y net-tools
         netstat -plunt
 
