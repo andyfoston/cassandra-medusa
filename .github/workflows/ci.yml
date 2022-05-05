@@ -115,7 +115,7 @@ jobs:
               ssl-ciphers: ""
             - python-version: "3.10"
               os-version: ubuntu-20.04
-              ssl-ciphers: "TLS_ECDHE_ECDSA_AES_256_CBC_SHA384"
+              ssl-ciphers: "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384"
             - cassandra-version: 2.2.19
               experimental: false
             - cassandra-version: 3.11.11
