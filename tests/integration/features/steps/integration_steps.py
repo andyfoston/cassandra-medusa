@@ -1283,7 +1283,7 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
         ssl_context.load_cert_chain(
             certfile=usercert,
             keyfile=userkey)
-        print("Permitted ciphers: {}" % PERMITTED_SSL_CIPHERS)
+        print("Permitted ciphers: %s" % PERMITTED_SSL_CIPHERS)
         if PERMITTED_SSL_CIPHERS:
             ssl_context.set_ciphers(PERMITTED_SSL_CIPHERS)
         _ssl_context = ssl_context
