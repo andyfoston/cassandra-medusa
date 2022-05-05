@@ -86,6 +86,7 @@ BUCKET_ROOT = "/tmp/medusa_it_bucket"
 CASSANDRA_YAML = "cassandra.yaml"
 AWS_CREDENTIALS = "~/.aws/credentials"
 GCS_CREDENTIALS = "~/medusa_credentials.json"
+PERMITTED_SSL_CIPHERS = os.environ.get("PERMITTED_SSL_CIPHERS")
 
 
 def kill_cassandra():
@@ -1275,6 +1276,7 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
     session = None
     _ssl_context = None
 
+
     if is_client_encryption_enable:
         ssl_context = SSLContext(tls_version)
         ssl_context.load_verify_locations(certfile)
@@ -1282,10 +1284,13 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
         ssl_context.load_cert_chain(
             certfile=usercert,
             keyfile=userkey)
+        if PERMITTED_SSL_CIPHERS:
+            ssl_context.set_ciphers(PERMITTED_SSL_CIPHERS)
         _ssl_context = ssl_context
 
     import pprint
     pprint.pprint(_ssl_context.get_ciphers())
+
     while not connected and attempt < 10:
         try:
             cluster = Cluster(contact_points=["127.0.0.1"],

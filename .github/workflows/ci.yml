@@ -112,8 +112,10 @@ jobs:
           include:
             - python-version: 3.6
               os-version: ubuntu-18.04
+              ssl-ciphers: ""
             - python-version: "3.10"
               os-version: ubuntu-20.04
+              ssl-ciphers: "AES128-SHA"
             - cassandra-version: 2.2.19
               experimental: false
             - cassandra-version: 3.11.11
@@ -212,6 +214,7 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.BUCKET_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.BUCKET_SECRET }}
+        PERMITTED_SSL_CIPHERS: ${{ matrix.ssl-ciphers }}
       run: |
         set +e
         . venv/bin/activate
