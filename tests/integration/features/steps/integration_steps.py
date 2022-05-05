@@ -25,7 +25,7 @@ import subprocess
 import time
 import uuid
 from pathlib import Path
-from ssl import SSLContext, PROTOCOL_TLS, CERT_REQUIRED
+from ssl import SSLContext, PROTOCOL_TLS, TLSVersion, CERT_REQUIRED
 from subprocess import PIPE
 from zipfile import ZipFile
 
@@ -1280,6 +1280,7 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
         ssl_context = SSLContext(tls_version)
         ssl_context.load_verify_locations(certfile)
         ssl_context.verify_mode = CERT_REQUIRED
+        ssl_context.minimum_version = TLSVersion.TLSv1_1
         ssl_context.load_cert_chain(
             certfile=usercert,
             keyfile=userkey)
