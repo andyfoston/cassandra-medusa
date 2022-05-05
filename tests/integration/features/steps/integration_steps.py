@@ -1270,7 +1270,7 @@ def _i_can_fecth_tokenmap_of_backup_named(context, backup_name):
     assert "127.0.0.1" in tokenmap
 
 
-def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
+def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLSv1_2):
     connected = False
     attempt = 0
     session = None
