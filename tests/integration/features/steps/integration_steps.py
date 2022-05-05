@@ -1284,6 +1284,8 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
             keyfile=userkey)
         _ssl_context = ssl_context
 
+    import pprint
+    pprint.pprint(_ssl_context.get_ciphers())
     while not connected and attempt < 10:
         try:
             cluster = Cluster(contact_points=["127.0.0.1"],
@@ -1294,7 +1296,6 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
         except cassandra.cluster.NoHostAvailable:
             attempt += 1
             if attempt >= 10:
-                print(_ssl_context.get_ciphers())
                 raise
             time.sleep(10)
 
