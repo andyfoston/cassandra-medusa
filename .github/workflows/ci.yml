@@ -60,10 +60,8 @@ jobs:
     # Build debian packages
     strategy:
       matrix:
-        suite: [focal, bionic]
+        suite: [bionic]
         include:
-          - suite: focal
-            os-version: ubuntu-20.04
           - suite: bionic
             os-version: ubuntu-18.04
     runs-on: ${{ matrix.os-version }}
@@ -112,6 +110,10 @@ jobs:
           #it-backend: [local, s3, gcs, minio, ibm, azure]
           cassandra-version: [2.2.19, 3.11.11, 4.0.0, 'github:apache/trunk']
           include:
+            - python-version: 3.6
+              os-version: ubuntu-18.04
+            - python-version: "3.10"
+              os-version: ubuntu-22.04
             - cassandra-version: 2.2.19
               experimental: false
             - cassandra-version: 3.11.11
@@ -147,7 +149,7 @@ jobs:
             - it-backend: azure
               python-version: "3.10"
             
-    runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os-version }}
     services:
       minio:
         image: lazybit/minio
