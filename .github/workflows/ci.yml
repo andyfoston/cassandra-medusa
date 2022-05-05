@@ -113,7 +113,7 @@ jobs:
             - python-version: 3.6
               os-version: ubuntu-18.04
             - python-version: "3.10"
-              os-version: ubuntu-22.04
+              os-version: ubuntu-20.04
             - cassandra-version: 2.2.19
               experimental: false
             - cassandra-version: 3.11.11
