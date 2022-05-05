@@ -1294,6 +1294,7 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
         except cassandra.cluster.NoHostAvailable:
             attempt += 1
             if attempt >= 10:
+                _print(ssl_context.get_ciphers())
                 raise
             time.sleep(10)
 
