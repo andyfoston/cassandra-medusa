@@ -121,7 +121,7 @@ def is_python_3_10():
 
 def get_client_encryption_opts(keystore_path, trustore_path):
     if is_python_3_10():
-        cipher_suite = "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+        cipher_suite = "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
     else:
         cipher_suite = "TLS_RSA_WITH_AES_256_CBC_SHA"
     return f"""ccm node1 updateconf -y 'client_encryption_options: {{ enabled: true,
