@@ -22,6 +22,7 @@ import random
 import shutil
 import signal
 import subprocess
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -86,7 +87,6 @@ BUCKET_ROOT = "/tmp/medusa_it_bucket"
 CASSANDRA_YAML = "cassandra.yaml"
 AWS_CREDENTIALS = "~/.aws/credentials"
 GCS_CREDENTIALS = "~/medusa_credentials.json"
-PERMITTED_SSL_CIPHERS = os.environ.get("PERMITTED_SSL_CIPHERS", "TLS_RSA_WITH_AES_256_CBC_SHA")
 
 
 def kill_cassandra():
@@ -114,12 +114,19 @@ def cleanup_storage(context, storage_provider):
         for obj in objects:
             storage.storage_driver.delete_object(obj)
 
+def is_python_3_10():
+    return sys.version_info >= (3, 10)
+
 
 def get_client_encryption_opts(keystore_path, trustore_path):
+    if is_python_3_10():
+        cipher_suite = "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+    else:
+        cipher_suite = "TLS_RSA_WITH_AES_256_CBC_SHA"
     return f"""ccm node1 updateconf -y 'client_encryption_options: {{ enabled: true,
         optional: false,keystore: {keystore_path}, keystore_password: testdata1,
         require_client_auth: true,truststore: {trustore_path},  truststore_password: truststorePass1,
-        protocol: TLS,algorithm: SunX509,store_type: JKS,cipher_suites: [{PERMITTED_SSL_CIPHERS}]}}'"""
+        protocol: TLS,algorithm: SunX509,store_type: JKS,cipher_suites: [{cipher_suite}]}}'"""
 
 
 def tune_ccm_settings(cluster_name):
@@ -820,8 +827,11 @@ def _i_can_download_the_backup_single_table_successfully(context, backup_name, f
 
 @then(r'Test TLS version connections if "{client_encryption}" is turned on')
 def _i_can_connect_using_all_tls_versions(context, client_encryption):
+    tls_versions = [PROTOCOL_TLSv1_2]
+    if not is_python_3_10():
+        tls_versions.insert(0, PROTOCOL_TLS)
     if client_encryption == 'with_client_encryption':
-        for tls_version in [PROTOCOL_TLSv1_2]:
+        for tls_version in tls_versions:
             connect_cassandra(True, tls_version)
 
 
@@ -1270,7 +1280,12 @@ def _i_can_fecth_tokenmap_of_backup_named(context, backup_name):
     assert "127.0.0.1" in tokenmap
 
 
-def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLSv1_2):
+def connect_cassandra(is_client_encryption_enable, tls_version=None):
+    if tls_version is None:
+        if is_python_3_10():
+            tls_version = PROTOCOL_TLSv1_2
+        else:
+            tls_version = PROTOCOL_TLS
     connected = False
     attempt = 0
     session = None
@@ -1283,7 +1298,6 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLSv1_2)
         ssl_context.load_cert_chain(
             certfile=usercert,
             keyfile=userkey)
-        print("Permitted ciphers: %s" % PERMITTED_SSL_CIPHERS)
         _ssl_context = ssl_context
 
     import pprint
@@ -1303,7 +1317,7 @@ def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLSv1_2)
                 raise
             time.sleep(10)
 
-    if tls_version is not PROTOCOL_TLS:  # other TLS versions used for testing, close the session
+    if tls_version is not PROTOCOL_TLS and not is_python_3_10():  # other TLS versions used for testing, close the session
         session.shutdown()
 
     return session
