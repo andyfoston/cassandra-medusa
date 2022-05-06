@@ -829,7 +829,7 @@ def _i_can_download_the_backup_single_table_successfully(context, backup_name, f
 @then(r'Test TLS version connections if "{client_encryption}" is turned on')
 def _i_can_connect_using_all_tls_versions(context, client_encryption):
     tls_versions = [PROTOCOL_TLSv1_2]
-    if not is_python_3_10():
+    if True:  # is_python_3_10():
         tls_versions.insert(0, PROTOCOL_TLS)
     if client_encryption == 'with_client_encryption':
         for tls_version in tls_versions:
