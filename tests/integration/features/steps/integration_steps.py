@@ -828,11 +828,8 @@ def _i_can_download_the_backup_single_table_successfully(context, backup_name, f
 
 @then(r'Test TLS version connections if "{client_encryption}" is turned on')
 def _i_can_connect_using_all_tls_versions(context, client_encryption):
-    tls_versions = [PROTOCOL_TLSv1_2]
-    if True:  # is_python_3_10():
-        tls_versions.insert(0, PROTOCOL_TLS)
     if client_encryption == 'with_client_encryption':
-        for tls_version in tls_versions:
+        for tls_version in [PROTOCOL_TLS, PROTOCOL_TLSv1_2]:
             connect_cassandra(True, tls_version)
 
 
@@ -1281,12 +1278,7 @@ def _i_can_fecth_tokenmap_of_backup_named(context, backup_name):
     assert "127.0.0.1" in tokenmap
 
 
-def connect_cassandra(is_client_encryption_enable, tls_version=None):
-    if tls_version is None:
-        if is_python_3_10():
-            tls_version = PROTOCOL_TLSv1_2
-        else:
-            tls_version = PROTOCOL_TLS
+def connect_cassandra(is_client_encryption_enable, tls_version=PROTOCOL_TLS):
     connected = False
     attempt = 0
     session = None
@@ -1301,9 +1293,6 @@ def connect_cassandra(is_client_encryption_enable, tls_version=None):
             keyfile=userkey)
         _ssl_context = ssl_context
 
-    import pprint
-    pprint.pprint(_ssl_context.get_ciphers())
-
     while not connected and attempt < 10:
         try:
             cluster = Cluster(contact_points=["127.0.0.1"],
@@ -1314,11 +1303,9 @@ def connect_cassandra(is_client_encryption_enable, tls_version=None):
         except cassandra.cluster.NoHostAvailable:
             attempt += 1
             if attempt >= 10:
-                print("Protocol version %s. Is PROTOCOL_TLS: %s" % (tls_version, tls_version is PROTOCOL_TLS))
                 raise
             time.sleep(10)
-    # other TLS versions used for testing, close the session
-    if tls_version is not PROTOCOL_TLS and not is_python_3_10():
+    if tls_version is not PROTOCOL_TLS:  # other TLS versions used for testing, close the session
         session.shutdown()
 
     return session
