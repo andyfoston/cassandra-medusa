@@ -114,6 +114,7 @@ def cleanup_storage(context, storage_provider):
         for obj in objects:
             storage.storage_driver.delete_object(obj)
 
+
 def is_python_3_10():
     return sys.version_info >= (3, 10)
 
@@ -1316,8 +1317,8 @@ def connect_cassandra(is_client_encryption_enable, tls_version=None):
                 print("Protocol version %s. Is PROTOCOL_TLS: %s" % (tls_version, tls_version is PROTOCOL_TLS))
                 raise
             time.sleep(10)
-
-    if tls_version is not PROTOCOL_TLS and not is_python_3_10():  # other TLS versions used for testing, close the session
+    # other TLS versions used for testing, close the session
+    if tls_version is not PROTOCOL_TLS and not is_python_3_10():
         session.shutdown()
 
     return session
