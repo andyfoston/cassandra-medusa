@@ -60,8 +60,10 @@ jobs:
     # Build debian packages
     strategy:
       matrix:
-        suite: [bionic]
+        suite: [focal, bionic]
         include:
+          - suite: focal
+            os-version: ubuntu-20.04
           - suite: bionic
             os-version: ubuntu-18.04
     runs-on: ${{ matrix.os-version }}
@@ -110,12 +112,6 @@ jobs:
           #it-backend: [local, s3, gcs, minio, ibm, azure]
           cassandra-version: [2.2.19, 3.11.11, 4.0.0, 'github:apache/trunk']
           include:
-            - python-version: 3.6
-              os-version: ubuntu-18.04
-              ssl-ciphers: ""
-            - python-version: "3.10"
-              os-version: ubuntu-20.04
-              ssl-ciphers: "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
             - cassandra-version: 2.2.19
               experimental: false
             - cassandra-version: 3.11.11
@@ -151,7 +147,7 @@ jobs:
             - it-backend: azure
               python-version: "3.10"
             
-    runs-on: ${{ matrix.os-version }}
+    runs-on: ubuntu-18.04
     services:
       minio:
         image: lazybit/minio
@@ -214,9 +210,8 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.BUCKET_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.BUCKET_SECRET }}
-        PERMITTED_SSL_CIPHERS: ${{ matrix.ssl-ciphers }}
       run: |
-        set +e
+        set -e
         . venv/bin/activate
         if [[ "${{ matrix.it-backend }}" == "ibm" ]];
         then
@@ -272,10 +267,6 @@ jobs:
         # Local storage tests
           ./run_integration_tests.sh -v --cassandra-version=${{ matrix.cassandra-version }}
         fi
-        echo "Logs...."
-        cat ~/.ccm/scenario1/node1/logs/system.log
-        apt install -y net-tools
-        netstat -plunt
 
         # Move and convert the coverage analysis file to XML
         mv tests/integration/.coverage .
