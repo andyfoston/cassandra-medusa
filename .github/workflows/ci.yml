@@ -60,8 +60,10 @@ jobs:
     # Build debian packages
     strategy:
       matrix:
-        suite: [focal, bionic]
+        suite: [jammy, focal, bionic]
         include:
+          - suite: jammy
+            os-version: ubuntu-22.04
           - suite: focal
             os-version: ubuntu-20.04
           - suite: bionic
@@ -307,8 +309,10 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     strategy:
       matrix:
-        suite: [focal, bionic]
+        suite: [jammy, focal, bionic]
         include:
+          - suite: jammy
+            os-version: ubuntu-22.04
           - suite: focal
             os-version: ubuntu-20.04
           - suite: bionic
